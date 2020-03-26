@@ -4,6 +4,7 @@ import android.content.res.AssetManager
 import androidx.annotation.WorkerThread
 import androidx.camera.core.ImageProxy
 import com.example.graduatework.tools.Constants
+import com.example.graduatework.tools.measureAndLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.tensorflow.lite.Interpreter
@@ -14,7 +15,12 @@ import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.util.concurrent.atomic.AtomicBoolean
 
-class TFTrafficSignsModel(private val assetManager: AssetManager) {
+
+class TFTrafficSignsModel(
+    private val assetManager: AssetManager,
+    private val tfInputProvider: TFInputProvider,
+    private val tfOutputProvider: TFOutputProvider
+) {
 
     private val atomicIsInitialised = AtomicBoolean(false)
 
@@ -22,6 +28,7 @@ class TFTrafficSignsModel(private val assetManager: AssetManager) {
         get() = atomicIsInitialised.get()
 
     private lateinit var tfLite: Interpreter
+
     private lateinit var labels: List<String>
 
     //region Initialization
@@ -31,6 +38,11 @@ class TFTrafficSignsModel(private val assetManager: AssetManager) {
             return
         }
         innerInitialize()
+    }
+
+    fun close() {
+        tfLite.close()
+        atomicIsInitialised.set(false)
     }
 
     private suspend fun innerInitialize() = withContext(Dispatchers.IO) {
@@ -49,7 +61,10 @@ class TFTrafficSignsModel(private val assetManager: AssetManager) {
                 declaredLength
             )
 
-            return Interpreter(fileChannel as ByteBuffer)
+            val options = Interpreter.Options()
+                .setUseNNAPI(true)
+
+            return Interpreter(fileChannel as ByteBuffer, options)
         }
     }
 
@@ -72,20 +87,28 @@ class TFTrafficSignsModel(private val assetManager: AssetManager) {
             throw NullPointerException("TF Model not initialized")
         }
 
-        val input = TFInput.create(
-            image = image,
-            isModelQuantized = true,
-            sensorOrientation = rotation
-        )
-        val output = TFOutput()
+        val input = measureAndLog("Input create time : ", TAG) {
+            tfInputProvider.create(
+                image = image,
+                isModelQuantized = true,
+                sensorOrientation = rotation
+            )
+        }
+        val output = measureAndLog("Output create time:", TAG) {
+            tfOutputProvider.create()
+        }
 
-        tfLite.runForMultipleInputsOutputs(
-            input.getInput(),
-            output.getOutput()
-        )
+        measureAndLog("Analyzing time : ", TAG) {
+            tfLite.runForMultipleInputsOutputs(
+                input.getInput(),
+                output.getOutput()
+            )
+        }
 
         output.mapToRecognizedSignsList(labels)
     }
 
-    //endregion
+    companion object {
+        private const val TAG = "TFOutputProvider"
+    }
 }

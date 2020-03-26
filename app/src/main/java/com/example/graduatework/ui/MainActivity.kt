@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.invoke
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -15,7 +16,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.example.graduatework.R
 import com.example.graduatework.tf.RecognizedSign
-import com.example.graduatework.tools.Constants.CAMERA_SIZE
+import com.example.graduatework.tools.ImageTransformer
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
@@ -92,12 +93,13 @@ class MainActivity : ComponentActivity(R.layout.activity_main),
     private fun getCameraAnalysis(): ImageAnalysis {
 
         return ImageAnalysis.Builder()
-            .setTargetResolution(CAMERA_SIZE)
+            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
             .setTargetRotation(Surface.ROTATION_90)
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build().apply {
                 setAnalyzer(Dispatchers.Default.asExecutor(), ImageAnalysis.Analyzer { image ->
                     val rotationDegrees = image.imageInfo.rotationDegrees + 90
+                    ImageTransformer.setAnalyzerImageSize(image.width, image.height)
                     presenter.analyzeImage(image, rotationDegrees)
                 })
             }

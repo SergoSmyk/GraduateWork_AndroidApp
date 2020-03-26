@@ -13,6 +13,10 @@ android {
         versionCode 1
         versionName "1.0"
 
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -25,6 +29,7 @@ android {
     aaptOptions {
         noCompress "tflite"
     }
+
     compileOptions {
         sourceCompatibility 1.8
         targetCompatibility 1.8
@@ -40,7 +45,8 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly'
+    implementation 'org.tensorflow:tensorflow-lite:2.0.0'
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.0.0'
     implementation "org.koin:koin-android:$koin_version"
     implementation "androidx.camera:camera-core:$camera_version"
     implementation "androidx.camera:camera-view:1.0.0-alpha08"

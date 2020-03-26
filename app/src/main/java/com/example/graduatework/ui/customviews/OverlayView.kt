@@ -27,6 +27,7 @@ class OverlayView @JvmOverloads constructor(
     private var rotation = 0
 
     private var signs by Delegates.observable<List<RecognizedSign>>(listOf()) { _, _, _ ->
+
         postInvalidate()
     }
 
@@ -40,20 +41,25 @@ class OverlayView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        transformSignsRect(canvas)
         for (index in signs.indices) {
             rectPaint.color = allColors.getOrElse(index) { Color.WHITE }
             drawRect(signs[index].rect, canvas)
         }
     }
 
-    private fun drawRect(rect: RectF, canvas: Canvas) {
-        ImageTransformer.transformToCameraInputSize(rect)
+    private fun transformSignsRect(canvas: Canvas) {
+        val listOfRect = signs.map { it.rect }
+        ImageTransformer.transformToCameraInputSize(listOfRect, rotation)
         ImageTransformer.transformForDrawing(
-            rect,
+            listOfRect,
             canvas.width,
             canvas.height,
             rotation
         )
+    }
+
+    private fun drawRect(rect: RectF, canvas: Canvas) {
         canvas.drawRect(rect, rectPaint)
     }
 }
