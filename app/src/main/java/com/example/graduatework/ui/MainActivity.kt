@@ -6,13 +6,13 @@ import android.os.Bundle
 import android.view.Surface
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.invoke
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import com.example.graduatework.R
 import com.example.graduatework.tf.RecognizedSign
@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import org.koin.android.ext.android.inject
+import timber.log.Timber
 
 class MainActivity : ComponentActivity(R.layout.activity_main),
     MainActivityContract.View {
@@ -40,13 +41,16 @@ class MainActivity : ComponentActivity(R.layout.activity_main),
         presenter.detachView()
     }
 
-    private val cameraPermissionsCall = prepareCall(RequestPermission()) { isGranted ->
-        presenter.cameraPermissionResult(isGranted)
-    }
+    private val cameraPermissionsCall =
+        registerForActivityResult(RequestPermission()) { isGranted ->
+            Timber.d("CAMERA permission GRANTED")
+            presenter.cameraPermissionResult(isGranted)
+        }
 
     override fun requestCameraPermission() {
         if (checkSelfPermission(CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            cameraPermissionsCall(CAMERA)
+            Timber.d("Request CAMERA permission")
+            cameraPermissionsCall.launch(CAMERA)
         } else {
             presenter.cameraPermissionResult(isGranted = true)
         }
@@ -77,16 +81,16 @@ class MainActivity : ComponentActivity(R.layout.activity_main),
             .requireLensFacing(CameraSelector.LENS_FACING_BACK)
             .build()
 
-        val preview = getCameraPreview()
+        val preview = getCameraPreview(previewView)
         val analysis = getCameraAnalysis()
 
         provider.bindToLifecycle(this, cameraSelector, preview, analysis)
     }
 
-    private fun getCameraPreview(): Preview {
+    private fun getCameraPreview(previewView: PreviewView): Preview {
         return Preview.Builder()
             .build().apply {
-                setSurfaceProvider(previewView.previewSurfaceProvider)
+                setSurfaceProvider(previewView.createSurfaceProvider())
             }
     }
 

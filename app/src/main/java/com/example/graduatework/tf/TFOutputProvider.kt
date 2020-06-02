@@ -37,7 +37,7 @@ class TFOutputProvider {
                 recognizedSigns.add(
                     RecognizedSign(
                         rect = signRect,
-                        label = labels[labelIndex],
+                        label = labels.getOrElse(labelIndex) { " " },
                         score = scores[index]
                     )
                 )
