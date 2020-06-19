@@ -51,6 +51,9 @@ class MainPresenter(
                     analyzeImage(image, rotation)
                         .filter { it.score > MIN_RESULT_SCORE }
                 }
+                signs.forEach {
+                    Timber.d("${it.label} ${it.score}")
+                }
 
                 image.close()
                 view?.drawRecognizedSigns(signs, rotation)

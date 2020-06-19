@@ -12,11 +12,6 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-
-        ndk {
-            abiFilters 'armeabi-v7a', 'arm64-v8a'
-        }
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -36,8 +31,8 @@ android {
     }
 }
 
-def camera_version = '1.0.0-beta04'
-def activity_version = '1.2.0-alpha05'
+def camera_version = '1.0.0-beta05'
+def activity_version = '1.2.0-alpha06'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -49,7 +44,7 @@ dependencies {
     implementation 'org.tensorflow:tensorflow-lite-gpu:2.0.0'
     implementation "org.koin:koin-android:$koin_version"
     implementation "androidx.camera:camera-core:$camera_version"
-    implementation "androidx.camera:camera-view:1.0.0-alpha11"
+    implementation "androidx.camera:camera-view:1.0.0-alpha12"
     implementation "androidx.camera:camera-lifecycle:$camera_version"
     implementation "androidx.camera:camera-camera2:$camera_version"
     implementation "androidx.activity:activity-ktx:$activity_version"
