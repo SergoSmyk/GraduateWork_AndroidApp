@@ -15,7 +15,6 @@ object Constants {
     const val IMAGE_MEAN = 128.0f
     const val IMAGE_STD = 128.0f
     const val NUM_DETECTIONS = 10
-    const val MIN_RESULT_SCORE = 0.11
+    const val MIN_RESULT_SCORE = 0.3
     //endregion
-
 }

@@ -14,13 +14,16 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.graduatework.R
 import com.example.graduatework.tf.RecognizedSign
 import com.example.graduatework.tools.ImageTransformer
+import com.example.graduatework.ui.adapter.Adapter
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -31,8 +34,12 @@ class MainActivity : ComponentActivity(R.layout.activity_main),
 
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
 
+    private lateinit var adapter: Adapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        adapter = Adapter()
+        namesList.adapter = adapter
         presenter.attachView(this)
     }
 
@@ -71,8 +78,11 @@ class MainActivity : ComponentActivity(R.layout.activity_main),
     }
 
     override fun drawRecognizedSigns(signs: List<RecognizedSign>, rotation: Int) {
-        overlayView.updateSigns(signs)
+        val coloredSigns = overlayView.updateSigns(signs)
         overlayView.setRotation(rotation)
+        lifecycleScope.launch(Dispatchers.Main) {
+            adapter.setNewItems(coloredSigns)
+        }
     }
 
     private fun bindCameraToLifecycle(provider: ProcessCameraProvider) {
@@ -90,7 +100,7 @@ class MainActivity : ComponentActivity(R.layout.activity_main),
     private fun getCameraPreview(previewView: PreviewView): Preview {
         return Preview.Builder()
             .build().apply {
-                setSurfaceProvider(previewView.createSurfaceProvider())
+                setSurfaceProvider(previewView.surfaceProvider)
             }
     }
 

@@ -50,6 +50,7 @@ class MainPresenter(
                 val signs = suspendMeasureAndLog("Full analyzing time: ", TAG) {
                     analyzeImage(image, rotation)
                         .filter { it.score > MIN_RESULT_SCORE }
+                        .sortedBy { -it.score }
                 }
                 signs.forEach {
                     Timber.d("${it.label} ${it.score}")

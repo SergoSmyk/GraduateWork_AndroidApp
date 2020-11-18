@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.View
 import com.example.graduatework.tf.RecognizedSign
 import com.example.graduatework.tools.ImageTransformer
+import kotlin.math.sign
 import kotlin.properties.Delegates
 
 class OverlayView @JvmOverloads constructor(
@@ -27,12 +28,16 @@ class OverlayView @JvmOverloads constructor(
     private var rotation = 0
 
     private var signs by Delegates.observable<List<RecognizedSign>>(listOf()) { _, _, _ ->
-
         postInvalidate()
     }
 
-    fun updateSigns(signs: List<RecognizedSign>) {
+    fun updateSigns(signs: List<RecognizedSign>): List<RecognizedSign> {
         this.signs = signs
+        for (index in signs.indices) {
+            val color = allColors.getOrElse(index) { Color.WHITE }
+            signs[index].attachColor(color)
+        }
+        return signs
     }
 
     fun setRotation(rotation: Int) {
@@ -43,7 +48,7 @@ class OverlayView @JvmOverloads constructor(
         super.onDraw(canvas)
         transformSignsRect(canvas)
         for (index in signs.indices) {
-            rectPaint.color = allColors.getOrElse(index) { Color.WHITE }
+            rectPaint.color = signs[index].getColor()
             drawRect(signs[index].rect, canvas)
         }
     }
