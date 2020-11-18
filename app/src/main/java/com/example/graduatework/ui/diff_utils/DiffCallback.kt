@@ -16,10 +16,10 @@ class DiffCallback(
     }
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return old[oldItemPosition].label == new[newItemPosition].label
+        return true
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return old[oldItemPosition].getColor() == new[newItemPosition].getColor()
+        return false
     }
 }

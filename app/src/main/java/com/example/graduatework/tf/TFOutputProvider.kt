@@ -33,7 +33,7 @@ class TFOutputProvider {
                     locations[index][3] * TF_INPUT_IMAGE_SIZE.width,
                     locations[index][2] * TF_INPUT_IMAGE_SIZE.width
                 )
-                val labelIndex = (classes[index] + 1).toInt() // 1 - offset of background class
+                val labelIndex = (classes[index]).toInt() // 1 - offset of background class
                 recognizedSigns.add(
                     RecognizedSign(
                         rect = signRect,

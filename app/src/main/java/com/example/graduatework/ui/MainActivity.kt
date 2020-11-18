@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity(R.layout.activity_main),
         super.onCreate(savedInstanceState)
         adapter = Adapter()
         namesList.adapter = adapter
+        namesList.itemAnimator = null
         presenter.attachView(this)
     }
 

@@ -17,7 +17,7 @@ class OverlayView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val lightColors = listOf(Color.RED, Color.YELLOW, Color.YELLOW)
-    private val darkColors = listOf(Color.CYAN, Color.BLUE, Color.BLACK)
+    private val darkColors = listOf(Color.CYAN, Color.BLUE, Color.MAGENTA)
     private val allColors = lightColors + darkColors
 
     private val rectPaint = Paint().apply {

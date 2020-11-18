@@ -1,5 +1,5 @@
-Information and indicative
-Danger
-Main road
-Mandatory
-Prohibitory
+Інформаційно-вказівні
+Попереджувальні
+Головна дорога
+Наказовий
+Заборонний
